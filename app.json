@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Heat Tap Arena",
+    "slug": "heat-tap-arena",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "android": {
+      "package": "com.rankine.heattaparena"
+    },
+    "ios": {
+      "bundleIdentifier": "com.rankine.heattaparena"
+    }
+  }
+}
