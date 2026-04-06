@@ -14,10 +14,14 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { BASE_URL, getClicks, HeatPoint, initSession, resetClicks, sendClick } from './src/services/heatmapApi';
 
 function heatColor(weight: number): string {
-  if (weight < 0.25) return `rgba(59, 130, 246, ${0.4 + weight * 0.8})`;
-  if (weight < 0.5) return `rgba(34, 197, 94, ${0.5 + weight * 0.6})`;
-  if (weight < 0.75) return `rgba(234, 179, 8, ${0.6 + weight * 0.5})`;
-  return `rgba(239, 68, 68, ${0.65 + weight * 0.35})`;
+  // 7-stop gradient: roxo → azul → ciano → verde → amarelo → laranja → vermelho
+  if (weight < 0.15) return `rgba(139, 92, 246, ${0.35 + weight * 1.5})`;   // roxo
+  if (weight < 0.30) return `rgba(59, 130, 246, ${0.45 + weight * 1.2})`;   // azul
+  if (weight < 0.45) return `rgba(6, 182, 212, ${0.50 + weight * 1.0})`;    // ciano
+  if (weight < 0.60) return `rgba(34, 197, 94, ${0.55 + weight * 0.8})`;    // verde
+  if (weight < 0.72) return `rgba(234, 179, 8, ${0.60 + weight * 0.6})`;    // amarelo
+  if (weight < 0.88) return `rgba(249, 115, 22, ${0.65 + weight * 0.4})`;   // laranja
+  return `rgba(239, 68, 68, ${0.70 + weight * 0.30})`;                       // vermelho
 }
 
 function heatRadius(weight: number, screenW: number): number {
