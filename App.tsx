@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
-import { BASE_URL, getClicks, HeatPoint, resetClicks, sendClick } from './src/services/heatmapApi';
+import { BASE_URL, getClicks, HeatPoint, initSession, resetClicks, sendClick } from './src/services/heatmapApi';
 
 function heatColor(weight: number): string {
   if (weight < 0.25) return `rgba(59, 130, 246, ${0.4 + weight * 0.8})`;
@@ -30,6 +30,8 @@ export default function App() {
   useEffect(() => {
     NavigationBar.setVisibilityAsync('hidden');
     NavigationBar.setBehaviorAsync('overlay-swipe');
+    // Cria a sessão antecipadamente para não atrasar o primeiro clique
+    initSession().catch(() => {});
   }, []);
 
   // Dimensões reais da área clicável, medidas após o layout renderizar.

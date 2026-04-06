@@ -1,3 +1,1 @@
-// Arquivo gerado automaticamente pelo backend ao iniciar.
-// Não edite manualmente.
-export const BACKEND_URL = 'https://kelli-unexcerpted-nondietetically.ngrok-free.dev';
+export const API_BASE = 'https://rest-api-black-omega.vercel.app';
