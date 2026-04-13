@@ -11,13 +11,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~6.1.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~54.0.21",
     "expo-constants": "~18.0.13",
     "expo-navigation-bar": "~5.0.10",
     "is-fullwidth-code-point": "^3.0.0",
     "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-native": "0.81.5",
+    "react-native-web": "^0.21.0",
     "string-width": "^4.2.3",
     "wrap-ansi": "^7.0.0"
   },
