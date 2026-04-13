@@ -7,7 +7,10 @@
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "android": {
-      "package": "com.rankine.heattaparena"
+      "package": "com.rankine.heattaparena",
+      "androidNavigationBar": {
+        "visible": "sticky-immersive"
+      }
     },
     "ios": {
       "bundleIdentifier": "com.rankine.heattaparena"
