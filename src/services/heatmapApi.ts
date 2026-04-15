@@ -36,17 +36,22 @@ async function ensureSession(): Promise<string> {
   if (!sessionId) throw new Error('Resposta da sessão sem ID: ' + JSON.stringify(data));
   return sessionId;
 }
-
+/**
+ * Representa um ponto do heatmap
+ */
 export type HeatPoint = {
-  x: number;
-  y: number;
-  count: number;
-  weight: number;
+  x: number;      // posição horizontal (0 a 1)
+  y: number;      // posição vertical (0 a 1)
+  count: number;  // quantidade de cliques agrupados
+  weight: number; // peso relativo (0 a 1)
 };
 
+/**
+ * Resposta da API de cliques
+ */
 export type ClicksResponse = {
-  total: number;
-  points: HeatPoint[];
+  total: number;       // total de cliques brutos
+  points: HeatPoint[]; // pontos já agrupados
 };
 
 /**
@@ -54,12 +59,14 @@ export type ClicksResponse = {
  * em clusters pelo centroide ponderado.
  */
 function clusterPoints(raw: { x: number; y: number }[], radius = 0.05): HeatPoint[] {
+  // Lista de clusters registrados
   const clusters: { x: number; y: number; count: number }[] = [];
 
   for (const p of raw) {
     let nearest: (typeof clusters)[0] | null = null;
     let minDist = Infinity;
 
+    // Procura o cluster mais próximo do toque registrado por último
     for (const c of clusters) {
       const dx = c.x - p.x;
       const dy = c.y - p.y;
@@ -70,17 +77,25 @@ function clusterPoints(raw: { x: number; y: number }[], radius = 0.05): HeatPoin
       }
     }
 
+// Caso exista um cluster próximo o suficiente, adiciona nele
     if (nearest && minDist < radius) {
       const total = nearest.count + 1;
+      
+      // Após adiconar o toque ao cluster, é recalculado o centro do cluster
       nearest.x = (nearest.x * nearest.count + p.x) / total;
       nearest.y = (nearest.y * nearest.count + p.y) / total;
       nearest.count = total;
+      
+  // Caso contrário cria um novo cluster
     } else {
       clusters.push({ x: p.x, y: p.y, count: 1 });
     }
   }
 
+  // Encontra o maior cluster para normalizar os pesos
   const maxCount = Math.max(...clusters.map((c) => c.count), 1);
+
+  // Retorna os clusters com peso relativo
   return clusters.map((c) => ({
     x: c.x,
     y: c.y,
@@ -89,10 +104,16 @@ function clusterPoints(raw: { x: number; y: number }[], radius = 0.05): HeatPoin
   }));
 }
 
+/**
+ * Inicializa a sessão
+ */
 export async function initSession(): Promise<void> {
   await ensureSession();
 }
 
+/**
+ * Envia um clique para o backend
+ */
 export async function sendClick(x: number, y: number): Promise<void> {
   const sid = await ensureSession();
   await fetchWithTimeout(`${API_BASE}/sessions/${sid}/clicks`, {
@@ -102,16 +123,22 @@ export async function sendClick(x: number, y: number): Promise<void> {
   });
 }
 
+/**
+ * Busca os cliques do backend e retorna já agrupados
+ */
 export async function getClicks(): Promise<ClicksResponse> {
   const sid = await ensureSession();
   const res = await fetchWithTimeout(`${API_BASE}/sessions/${sid}/clicks`);
   const text = await res.text();
 
+   // Verifica erro HTTP
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
   }
 
   let raw: unknown;
+  
+  // Tenta converter resposta para JSON
   try {
     raw = JSON.parse(text);
   } catch {
@@ -128,10 +155,15 @@ export async function getClicks(): Promise<ClicksResponse> {
     items = Array.isArray(list) ? (list as { x: number; y: number }[]) : [];
   }
 
+  // Agrupa os pontos (heatmap)
   const points = clusterPoints(items);
   return { total: items.length, points };
 }
 
+/**
+ * Remove todos os cliques da sessão atual
+ * e força a criação de uma nova sessão
+ */
 export async function resetClicks(): Promise<void> {
   const sid = await ensureSession();
   await fetchWithTimeout(`${API_BASE}/sessions/${sid}/clicks`, { method: 'DELETE' });
